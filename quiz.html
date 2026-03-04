@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小テスト｜運動学実習</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="header">
+  <h1 id="quiz-title">読み込み中...</h1>
+  <p>運動学実習 小テスト</p>
+</div>
+
+<div class="container">
+
+  <!-- ローディング -->
+  <div id="loading" class="card loading">データを読み込んでいます...</div>
+
+  <!-- 学籍番号入力 -->
+  <div id="screen-id" class="card" style="display:none;">
+    <div class="student-id-section">
+      <label for="student-id">学籍番号を入力してください</label>
+      <input
+        type="text"
+        id="student-id"
+        placeholder="例：256301"
+        maxlength="20"
+        autocomplete="off"
+      >
+    </div>
+    <button class="btn btn-primary" id="btn-start">テストを開始する</button>
+    <p style="font-size:13px;color:#888;margin-top:12px;text-align:center;">
+      ※ 回答後に結果がスプレッドシートへ送信されます
+    </p>
+  </div>
+
+  <!-- 問題 -->
+  <div id="screen-question" class="card" style="display:none;">
+    <p class="progress-text" id="progress-text">問題 1 / 5</p>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+    <p class="question-text" id="question-text"></p>
+    <ul class="options-list" id="options-list"></ul>
+    <div class="feedback-box" id="feedback-box"></div>
+    <button class="btn btn-primary" id="btn-next" style="display:none;">次の問題へ</button>
+  </div>
+
+  <!-- 結果 -->
+  <div id="screen-result" class="card" style="display:none;">
+    <h2 style="text-align:center;font-size:18px;margin-bottom:12px;">テスト結果</h2>
+    <div class="result-score" id="result-score"></div>
+    <div class="result-label">問正解</div>
+    <p class="result-message" id="result-message"></p>
+    <ul class="result-list" id="result-list"></ul>
+    <div class="submit-status" id="submit-status"></div>
+    <a href="index.html" class="btn btn-primary" style="text-align:center;text-decoration:none;display:block;">
+      テスト一覧に戻る
+    </a>
+  </div>
+
+</div>
+
+<script src="js/quiz.js"></script>
+</body>
+</html>

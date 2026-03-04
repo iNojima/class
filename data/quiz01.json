@@ -1,0 +1,66 @@
+{
+  "id": 1,
+  "title": "小テスト①：Rを使ったデータ解析",
+  "questions": [
+    {
+      "id": 1,
+      "question": "RStudioで現在の作業ディレクトリ（パス）を確認するコマンドはどれか？",
+      "options": [
+        "setwd()",
+        "getwd()",
+        "pwd()",
+        "dir()"
+      ],
+      "answer": 1,
+      "explanation": "getwd()（get working directory）で現在の作業ディレクトリを確認できる。setwd()は作業ディレクトリの変更に使う。"
+    },
+    {
+      "id": 2,
+      "question": "RStudioの4つのペインのうち、スクリプトを作成・編集し、保存できるのはどれか？",
+      "options": [
+        "Consoleペイン",
+        "Environmentペイン",
+        "Sourceペイン",
+        "Plotsペイン"
+      ],
+      "answer": 2,
+      "explanation": "Sourceペインではスクリプトを作成・編集・保存できる。Consoleペインでも入力できるが保存されないため、再利用したいコードはSourceペインに記述する。"
+    },
+    {
+      "id": 3,
+      "question": "Rでcsvファイルを読み込む際に使用する関数として正しいのはどれか？",
+      "options": [
+        "read_excel()",
+        "library(dplyr)",
+        "read_csv()",
+        "import_csv()"
+      ],
+      "answer": 2,
+      "explanation": "read_csv()はreadrパッケージの関数で、csvファイルを読み込む。デフォルトでUTF-8を使用する。Excelファイルにはread_excel()（readxlパッケージ）を使う。"
+    },
+    {
+      "id": 4,
+      "question": "Rにおいて変数への代入に使う演算子はどれか？",
+      "options": [
+        "= のみ",
+        "-> のみ",
+        "<- または =",
+        ":="
+      ],
+      "answer": 2,
+      "explanation": "Rでは「<-」が代入演算子として推奨される（例：x <- 5）。「=」も使えるが、関数の引数と紛らわしいため<-が一般的。"
+    },
+    {
+      "id": 5,
+      "question": "Rのデータフレームで欠損値が存在する場合、その値はどのように表示されるか？",
+      "options": [
+        "NULL",
+        "NA",
+        "NaN",
+        "0"
+      ],
+      "answer": 1,
+      "explanation": "NAはNot Availableの略で、欠損値を表す。NULLはオブジェクトが存在しないことを示し、NaNはNot a Numberで数値計算の結果が不定・不能の場合に使われる。"
+    }
+  ]
+}

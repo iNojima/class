@@ -207,26 +207,18 @@ function submitToSpreadsheet(correct, total) {
   statusEl.textContent = "送信中...";
   statusEl.className = "submit-status sending";
 
-  const payload = {
+  // GETリクエスト＋URLパラメータで送信（no-corsでも確実に届く）
+  const params = new URLSearchParams({
     timestamp: new Date().toLocaleString("ja-JP"),
     studentId,
-    quizId: quizData.id,
+    quizId: String(quizData.id),
     quizTitle: quizData.title,
-    score: correct,
-    total,
+    score: String(correct),
+    total: String(total),
     answers: answers.map(a => (a.isCorrect ? "○" : "×")).join(",")
-  };
+  });
 
-    // no-corsモードではapplication/jsonが使えないためURLSearchParamsで送信
-  const formData = new URLSearchParams();
-  Object.entries(payload).forEach(([k, v]) => formData.append(k, String(v)));
-
-  fetch(GAS_URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: formData
-  })
-
+  fetch(`${GAS_URL}?${params}`, { mode: "no-cors" })
     .then(() => {
       statusEl.textContent = "✓ 結果を送信しました";
       statusEl.className = "submit-status success";

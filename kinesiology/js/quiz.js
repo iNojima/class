@@ -217,12 +217,16 @@ function submitToSpreadsheet(correct, total) {
     answers: answers.map(a => (a.isCorrect ? "○" : "×")).join(",")
   };
 
+    // no-corsモードではapplication/jsonが使えないためURLSearchParamsで送信
+  const formData = new URLSearchParams();
+  Object.entries(payload).forEach(([k, v]) => formData.append(k, String(v)));
+
   fetch(GAS_URL, {
     method: "POST",
     mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: formData
   })
+
     .then(() => {
       statusEl.textContent = "✓ 結果を送信しました";
       statusEl.className = "submit-status success";

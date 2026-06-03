@@ -2,7 +2,7 @@
 // Google Apps Script Web App URL（設定必須）
 // gas/presentation1_code.gs をデプロイ後、発行されたURLをここに貼り付ける
 // =====================================================================
-const GAS_URL = "";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwKkGAQ47jOUMlrUfd3sYOG0Eb774ulodO9aVm03krdweq7TPVEJWr2-ZpVZLN-X40r/exec";
 
 const GROUPS = ["Group1", "Group2", "Group3", "Group4"];
 

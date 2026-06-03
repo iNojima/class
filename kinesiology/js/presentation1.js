@@ -104,7 +104,6 @@ return values;
 
 function validateSection(values, ownGroup, sectionLabel) {
 const errors = [];
-
 const selectedGroups = values.map(function(v) {
 return v.group;
 }).filter(Boolean);

@@ -1,250 +1,196 @@
-// =====================================================================
-// presentation1.js
-// 運動学実習 発表アンケート presentation1
-// =====================================================================
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>発表アンケート｜運動学実習 presentation1</title>
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzzM04vhtOoISLuDQC8frpXRC6SXFRyYa2pV5j_X-qArn4ftW8ZFmKrckM_tfqv0RlK/exec";
+  <link rel="stylesheet" href="./css/style.css" />
 
-const GROUPS = ["Group1", "Group2", "Group3", "Group4"];
-
-function createEvalBlock(sectionId, prefix, index) {
-  const section = document.getElementById(sectionId);
-  if (!section) return;
-
-  const block = document.createElement("div");
-  block.className = "eval-block";
-
-  block.innerHTML =
-    '<h3>' + (index + 1) + 'グループ目</h3>' +
-    '<div class="form-row">' +
-      '<label for="' + prefix + '-group-' + index + '">' +
-        '発表グループ <span class="required">必須</span>' +
-      '</label>' +
-      '<select id="' + prefix + '-group-' + index + '" class="group-select" data-prefix="' + prefix + '">' +
-        '<option value="">選択してください</option>' +
-        GROUPS.map(function(group) {
-          return '<option value="' + group + '">' + group + '</option>';
-        }).join("") +
-      '</select>' +
-    '</div>' +
-    '<div class="form-row">' +
-      '<label for="' + prefix + '-comment-' + index + '">' +
-        '自由記載 <span class="required">必須</span>' +
-      '</label>' +
-      '<textarea id="' + prefix + '-comment-' + index + '" placeholder="発表内容で良かった点、わかりやすかった点、質問、今後の改善点などを記入してください。"></textarea>' +
-    '</div>';
-
-  section.appendChild(block);
-}
-
-function initForm() {
-  for (let i = 0; i < 3; i++) {
-    createEvalBlock("strength-section", "strength", i);
-    createEvalBlock("cop-section", "cop", i);
-  }
-
-  const ownGroupEl = document.getElementById("own-group");
-  if (ownGroupEl) {
-    ownGroupEl.addEventListener("change", updateGroupOptions);
-  }
-
-  document.querySelectorAll(".group-select").forEach(function(select) {
-    select.addEventListener("change", updateGroupOptions);
-  });
-
-  const submitBtn = document.getElementById("btn-submit");
-  if (submitBtn) {
-    submitBtn.addEventListener("click", submitForm);
-  }
-
-  updateGroupOptions();
-}
-
-document.addEventListener("DOMContentLoaded", initForm);
-
-function updateGroupOptions() {
-  const ownGroupEl = document.getElementById("own-group");
-  const ownGroup = ownGroupEl ? ownGroupEl.value : "";
-
-  document.querySelectorAll(".group-select").forEach(function(select) {
-    const currentValue = select.value;
-
-    Array.from(select.options).forEach(function(option) {
-      if (!option.value) return;
-      option.disabled = option.value === ownGroup;
-    });
-
-    if (currentValue === ownGroup) {
-      select.value = "";
+  <style>
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1a5276;
+      margin: 24px 0 8px;
+      border-left: 5px solid #1a5276;
+      padding-left: 10px;
     }
-  });
-}
 
-function getSectionValues(prefix) {
-  const values = [];
-
-  for (let i = 0; i < 3; i++) {
-    const groupEl = document.getElementById(prefix + "-group-" + i);
-    const commentEl = document.getElementById(prefix + "-comment-" + i);
-
-    values.push({
-      group: groupEl ? groupEl.value : "",
-      comment: commentEl ? commentEl.value.trim() : ""
-    });
-  }
-
-  return values;
-}
-
-function validateSection(values, ownGroup, sectionLabel) {
-  const errors = [];
-  const selectedGroups = values.map(function(v) {
-    return v.group;
-  }).filter(Boolean);
-
-  if (values.some(function(v) { return !v.group; })) {
-    errors.push(sectionLabel + "：発表グループを3つ選択してください。");
-  }
-
-  if (values.some(function(v) { return !v.comment; })) {
-    errors.push(sectionLabel + "：自由記載をすべて入力してください。");
-  }
-
-  if (ownGroup && selectedGroups.includes(ownGroup)) {
-    errors.push(sectionLabel + "：自分のグループは選択できません。");
-  }
-
-  if (new Set(selectedGroups).size !== selectedGroups.length) {
-    errors.push(sectionLabel + "：同じグループが重複しています。");
-  }
-
-  if (ownGroup && selectedGroups.length === 3) {
-    const expected = GROUPS.filter(function(group) {
-      return group !== ownGroup;
-    }).sort().join(",");
-
-    const actual = Array.from(new Set(selectedGroups)).sort().join(",");
-
-    if (expected !== actual) {
-      errors.push(sectionLabel + "：自分以外の3グループをすべて選択してください。");
+    .help-text {
+      font-size: 13px;
+      color: #666;
+      margin: 4px 0 12px;
     }
-  }
 
-  return errors;
-}
-
-function validateForm() {
-  const errors = [];
-
-  const studentIdEl = document.getElementById("student-id");
-  const ownGroupEl = document.getElementById("own-group");
-
-  const studentId = studentIdEl ? studentIdEl.value.trim() : "";
-  const ownGroup = ownGroupEl ? ownGroupEl.value : "";
-
-  const strength = getSectionValues("strength");
-  const cop = getSectionValues("cop");
-
-  if (!/^c\d{6}$/i.test(studentId)) {
-    errors.push("学籍番号は c251111 の形式で入力してください。");
-  }
-
-  if (!ownGroup) {
-    errors.push("自分のグループを選択してください。");
-  }
-
-  errors.push.apply(errors, validateSection(strength, ownGroup, "筋力"));
-  errors.push.apply(errors, validateSection(cop, ownGroup, "重心動揺"));
-
-  return {
-    errors: errors,
-    studentId: studentId,
-    ownGroup: ownGroup,
-    strength: strength,
-    cop: cop
-  };
-}
-
-function submitForm() {
-  const errorEl = document.getElementById("error-message");
-  const statusEl = document.getElementById("submit-status");
-  const btn = document.getElementById("btn-submit");
-
-  if (errorEl) errorEl.textContent = "";
-
-  if (statusEl) {
-    statusEl.textContent = "";
-    statusEl.className = "submit-status";
-  }
-
-  const result = validateForm();
-
-  if (result.errors.length > 0) {
-    if (errorEl) {
-      errorEl.textContent = result.errors.join("\n");
+    .form-row {
+      margin-top: 16px;
     }
-    return;
-  }
 
-  if (!GAS_URL || GAS_URL.includes("ここに") || GAS_URL.includes("YOUR_GAS")) {
-    if (statusEl) {
-      statusEl.textContent = "※ 送信先未設定（js/presentation1.js の GAS_URL を設定してください）";
-      statusEl.className = "submit-status error";
+    .form-row label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
     }
-    return;
-  }
 
-  if (btn) btn.disabled = true;
+    select,
+    textarea,
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 16px;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      outline: none;
+      background: #fff;
+      box-sizing: border-box;
+    }
 
-  if (statusEl) {
-    statusEl.textContent = "送信中...";
-    statusEl.className = "submit-status sending";
-  }
+    select:focus,
+    textarea:focus,
+    input[type="text"]:focus {
+      border-color: #1a5276;
+    }
 
-  const params = new URLSearchParams();
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+      line-height: 1.6;
+    }
 
-  params.append("type", "presentation1");
-  params.append("studentId", result.studentId);
-  params.append("ownGroup", result.ownGroup);
+    .eval-block {
+      border: 1px solid #dde3ec;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 14px;
+      background: #fbfcfe;
+    }
 
-  params.append("strengthGroup1", result.strength[0].group);
-  params.append("strengthComment1", result.strength[0].comment);
-  params.append("strengthGroup2", result.strength[1].group);
-  params.append("strengthComment2", result.strength[1].comment);
-  params.append("strengthGroup3", result.strength[2].group);
-  params.append("strengthComment3", result.strength[2].comment);
+    .eval-block h3 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 10px;
+    }
 
-  params.append("copGroup1", result.cop[0].group);
-  params.append("copComment1", result.cop[0].comment);
-  params.append("copGroup2", result.cop[1].group);
-  params.append("copComment2", result.cop[1].comment);
-  params.append("copGroup3", result.cop[2].group);
-  params.append("copComment3", result.cop[2].comment);
+    .required {
+      color: #c0392b;
+      font-size: 13px;
+      margin-left: 4px;
+    }
 
-  fetch(GAS_URL + "?" + params.toString(), {
-    method: "GET",
-    mode: "no-cors"
-  })
-    .then(function() {
-      const formCard = document.getElementById("form-card");
-      const thanksCard = document.getElementById("thanks-card");
+    .notice {
+      background: #eaf0f8;
+      border-left: 4px solid #1a5276;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-top: 12px;
+    }
 
-      if (formCard) formCard.style.display = "none";
-      if (thanksCard) thanksCard.style.display = "block";
+    .error-message {
+      color: #c0392b;
+      font-weight: bold;
+      margin-top: 12px;
+      white-space: pre-line;
+    }
 
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-    })
-    .catch(function(error) {
-      console.error(error);
+    .submit-status {
+      margin-top: 12px;
+      font-weight: bold;
+      white-space: pre-line;
+    }
 
-      if (btn) btn.disabled = false;
+    .submit-status.sending {
+      color: #1a5276;
+    }
 
-      if (statusEl) {
-        statusEl.textContent = "送信に失敗しました。ネットワーク環境を確認して、もう一度送信してください。";
-        statusEl.className = "submit-status error";
-      }
-    });
-}
+    .submit-status.error {
+      color: #c0392b;
+    }
+
+    .success-message {
+      color: #27ae60;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 16px;
+      white-space: pre-line;
+    }
+  </style>
+
+  <script src="./js/presentation1.js?v=48" defer></script>
+</head>
+
+<body>
+  <header class="header">
+    <h1>運動学実習 発表アンケート presentation1</h1>
+    <p>筋力・重心動揺に関するグループ発表の相互評価</p>
+  </header>
+
+  <main class="container">
+    <section class="card" id="form-card">
+      <p class="notice">
+        自分のグループ以外の3グループについて、筋力と重心動揺それぞれの感想を記入してください。
+      </p>
+
+      <div class="student-id-section form-row">
+        <label for="student-id">
+          1）学籍番号 <span class="required">必須</span>
+        </label>
+        <input
+          type="text"
+          id="student-id"
+          placeholder="例：c251111"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="form-row">
+        <label for="own-group">
+          自分のグループ <span class="required">必須</span>
+        </label>
+        <select id="own-group">
+          <option value="">選択してください</option>
+          <option value="Group1">Group1</option>
+          <option value="Group2">Group2</option>
+          <option value="Group3">Group3</option>
+          <option value="Group4">Group4</option>
+        </select>
+      </div>
+
+      <h2 class="section-title">2）筋力の感想</h2>
+      <p class="help-text">
+        自分のグループ以外の3グループを選び、それぞれ自由記載で感想を入力してください。
+      </p>
+      <div id="strength-section"></div>
+
+      <h2 class="section-title">3）重心動揺の感想</h2>
+      <p class="help-text">
+        自分のグループ以外の3グループを選び、それぞれ自由記載で感想を入力してください。
+      </p>
+      <div id="cop-section"></div>
+
+      <div id="error-message" class="error-message"></div>
+
+      <button id="btn-submit" class="btn btn-primary" type="button">
+        回答を送信する
+      </button>
+
+      <div id="submit-status" class="submit-status"></div>
+    </section>
+
+    <section class="card" id="thanks-card" style="display: none;">
+      <h2 style="text-align: center; color: #1a5276;">送信完了</h2>
+      <p class="success-message">
+        回答を送信しました。ありがとうございました。
+      </p>
+      <a
+        href="index.html"
+        class="btn btn-success"
+        style="text-align: center; text-decoration: none;"
+      >
+        トップページに戻る
+      </a>
+    </section>
+  </main>
+</body>
+</html>

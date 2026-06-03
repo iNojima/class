@@ -2,6 +2,14 @@ const SPREADSHEET_ID = '1_bytLT4Ksj-2e4UBvOQrj19W1E7EvIgnMf5ZaLTMjGY';
 const SHEET_NAME = 'presentation1';
 
 function doGet(e) {
+  return saveResponse(e);
+}
+
+function doPost(e) {
+  return saveResponse(e);
+}
+
+function saveResponse(e) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
@@ -30,30 +38,37 @@ function doGet(e) {
     sheet.appendRow(header);
   }
 
-  const p = e.parameter || {};
+  let p = {};
+  if (e && e.parameter) {
+    p = e.parameter;
+  }
+
+  if ((!p || Object.keys(p).length === 0) && e && e.queryString) {
+    p = parseQueryString(e.queryString);
+  }
 
   const row = [
     new Date(),
 
-    p.studentId || p.student_id || '',
-    p.ownGroup || p.own_group || '',
+    p.studentId || '',
+    p.ownGroup || '',
 
-    p.strengthGroup1 || p.strength_group_1 || '',
-    p.strengthComment1 || p.strength_comment_1 || '',
-    p.strengthGroup2 || p.strength_group_2 || '',
-    p.strengthComment2 || p.strength_comment_2 || '',
-    p.strengthGroup3 || p.strength_group_3 || '',
-    p.strengthComment3 || p.strength_comment_3 || '',
+    p.strengthGroup1 || '',
+    p.strengthComment1 || '',
+    p.strengthGroup2 || '',
+    p.strengthComment2 || '',
+    p.strengthGroup3 || '',
+    p.strengthComment3 || '',
 
-    p.copGroup1 || p.cop_group_1 || '',
-    p.copComment1 || p.cop_comment_1 || '',
-    p.copGroup2 || p.cop_group_2 || '',
-    p.copComment2 || p.cop_comment_2 || '',
-    p.copGroup3 || p.cop_group_3 || '',
-    p.copComment3 || p.cop_comment_3 || '',
+    p.copGroup1 || '',
+    p.copComment1 || '',
+    p.copGroup2 || '',
+    p.copComment2 || '',
+    p.copGroup3 || '',
+    p.copComment3 || '',
 
     JSON.stringify(p),
-    e.queryString || ''
+    e && e.queryString ? e.queryString : ''
   ];
 
   sheet.appendRow(row);
@@ -62,7 +77,23 @@ function doGet(e) {
     .createTextOutput(JSON.stringify({
       status: 'ok',
       received: p,
-      queryString: e.queryString || ''
+      queryString: e && e.queryString ? e.queryString : ''
     }))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+function parseQueryString(queryString) {
+  const params = {};
+
+  queryString.split('&').forEach(function(pair) {
+    const parts = pair.split('=');
+    const key = decodeURIComponent((parts[0] || '').replace(/\+/g, ' '));
+    const value = decodeURIComponent((parts.slice(1).join('=') || '').replace(/\+/g, ' '));
+
+    if (key) {
+      params[key] = value;
+    }
+  });
+
+  return params;
 }

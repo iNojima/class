@@ -145,9 +145,9 @@ function validateForm() {
   const strength = getSectionValues("strength");
   const cop = getSectionValues("cop");
 
-  if (!/^c\d{6}$/i.test(studentId)) {
-    errors.push("学籍番号は c251111 の形式で入力してください。");
-  }
+  if (!/^[a-z]\d{6}$/i.test(studentId)) {
+  errors.push("学籍番号は c251234 のように、英字1文字＋数字6桁で入力してください。");
+}
 
   if (!ownGroup) {
     errors.push("自分のグループを選択してください。");

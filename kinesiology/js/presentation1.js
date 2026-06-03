@@ -6,7 +6,7 @@
 
 // Google Apps Script Web App URL
 // Apps Scriptで「ウェブアプリ」としてデプロイした /exec で終わるURLを入れる
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwKkGAQ47jOUMlrUfd3sYOG0Eb774ulodO9aVm03krdweq7TPVEJWr2-ZpVZLN-X40r/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzzM04vhtOoISLuDQC8frpXRC6SXFRyYa2pV5j_X-qArn4ftW8ZFmKrckM_tfqv0RlK/exec";
 
 const GROUPS = ["Group1", "Group2", "Group3", "Group4"];
 

@@ -16,27 +16,23 @@ block.className = "eval-block";
 
 block.innerHTML =
 '<h3>' + (index + 1) + 'グループ目</h3>' +
-
-```
 '<div class="form-row">' +
-  '<label for="' + prefix + '-group-' + index + '">' +
-    '発表グループ <span class="required">必須</span>' +
-  '</label>' +
-  '<select id="' + prefix + '-group-' + index + '" class="group-select" data-prefix="' + prefix + '">' +
-    '<option value="">選択してください</option>' +
-    GROUPS.map(function(group) {
-      return '<option value="' + group + '">' + group + '</option>';
-    }).join("") +
-  '</select>' +
+'<label for="' + prefix + '-group-' + index + '">' +
+'発表グループ <span class="required">必須</span>' +
+'</label>' +
+'<select id="' + prefix + '-group-' + index + '" class="group-select" data-prefix="' + prefix + '">' +
+'<option value="">選択してください</option>' +
+GROUPS.map(function(group) {
+return '<option value="' + group + '">' + group + '</option>';
+}).join("") +
+'</select>' +
 '</div>' +
-
 '<div class="form-row">' +
-  '<label for="' + prefix + '-comment-' + index + '">' +
-    '自由記載 <span class="required">必須</span>' +
-  '</label>' +
-  '<textarea id="' + prefix + '-comment-' + index + '" placeholder="発表内容で良かった点、わかりやすかった点、質問、今後の改善点などを記入してください。"></textarea>' +
+'<label for="' + prefix + '-comment-' + index + '">' +
+'自由記載 <span class="required">必須</span>' +
+'</label>' +
+'<textarea id="' + prefix + '-comment-' + index + '" placeholder="発表内容で良かった点、わかりやすかった点、質問、今後の改善点などを記入してください。"></textarea>' +
 '</div>';
-```
 
 section.appendChild(block);
 }
@@ -108,6 +104,7 @@ return values;
 
 function validateSection(values, ownGroup, sectionLabel) {
 const errors = [];
+
 const selectedGroups = values.map(function(v) {
 return v.group;
 }).filter(Boolean);

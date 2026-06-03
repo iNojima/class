@@ -2,41 +2,27 @@ const SPREADSHEET_ID = '1_bytLT4Ksj-2e4UBvOQrj19W1E7EvIgnMf5ZaLTMjGY';
 const SHEET_NAME = 'presentation1';
 
 function doGet(e) {
-  return saveResponse(e);
-}
-
-function doPost(e) {
-  return saveResponse(e);
-}
-
-function saveResponse(e) {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
   let sheet = ss.getSheetByName(SHEET_NAME);
-
-  if (!sheet) {
-    sheet = ss.insertSheet(SHEET_NAME);
-  }
+  if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
 
   const header = [
     'タイムスタンプ',
     '学籍番号',
     '自分のグループ',
-
     '筋力1_Group',
     '筋力1_感想',
     '筋力2_Group',
     '筋力2_感想',
     '筋力3_Group',
     '筋力3_感想',
-
     '重心動揺1_Group',
     '重心動揺1_感想',
     '重心動揺2_Group',
     '重心動揺2_感想',
     '重心動揺3_Group',
     '重心動揺3_感想',
-
-    'debug_parameter_json',
+    'debug_all_parameters',
     'debug_query_string'
   ];
 
@@ -44,29 +30,30 @@ function saveResponse(e) {
     sheet.appendRow(header);
   }
 
-  const p = e && e.parameter ? e.parameter : {};
+  const p = e.parameter || {};
 
   const row = [
     new Date(),
-    p.studentId || '',
-    p.ownGroup || '',
 
-    p.strengthGroup1 || '',
-    p.strengthComment1 || '',
-    p.strengthGroup2 || '',
-    p.strengthComment2 || '',
-    p.strengthGroup3 || '',
-    p.strengthComment3 || '',
+    p.studentId || p.student_id || '',
+    p.ownGroup || p.own_group || '',
 
-    p.copGroup1 || '',
-    p.copComment1 || '',
-    p.copGroup2 || '',
-    p.copComment2 || '',
-    p.copGroup3 || '',
-    p.copComment3 || '',
+    p.strengthGroup1 || p.strength_group_1 || '',
+    p.strengthComment1 || p.strength_comment_1 || '',
+    p.strengthGroup2 || p.strength_group_2 || '',
+    p.strengthComment2 || p.strength_comment_2 || '',
+    p.strengthGroup3 || p.strength_group_3 || '',
+    p.strengthComment3 || p.strength_comment_3 || '',
+
+    p.copGroup1 || p.cop_group_1 || '',
+    p.copComment1 || p.cop_comment_1 || '',
+    p.copGroup2 || p.cop_group_2 || '',
+    p.copComment2 || p.cop_comment_2 || '',
+    p.copGroup3 || p.cop_group_3 || '',
+    p.copComment3 || p.cop_comment_3 || '',
 
     JSON.stringify(p),
-    e && e.queryString ? e.queryString : ''
+    e.queryString || ''
   ];
 
   sheet.appendRow(row);
@@ -74,7 +61,8 @@ function saveResponse(e) {
   return ContentService
     .createTextOutput(JSON.stringify({
       status: 'ok',
-      received: p
+      received: p,
+      queryString: e.queryString || ''
     }))
     .setMimeType(ContentService.MimeType.JSON);
 }

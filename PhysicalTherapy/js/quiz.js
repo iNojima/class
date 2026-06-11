@@ -1,4 +1,4 @@
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwelGIejt6UR8DNzETWyPl-3Xulh1lBxWt4xgsHYG8YJBlN_Ih1XEdonpcJyS8NYFjOYA/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbwelGIejt6UR8DNzETWyPl-3Xulh1lBxWt4xgsHYG8YJBlN_Ih1XEdonpcJyS8NYFjOYA/exec?action=check&studentId=test001&quizId=1&callback=testCallback";
 
 let quizData = null;
 let currentIndex = 0;

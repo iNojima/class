@@ -14,19 +14,17 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  const normalizedQuizId = String(Number(quizId)).padStart(2, "0");
+  const normalizedQuizId = normalizeQuizId(quizId);
 
-  fetch(`data/quiz${normalizedQuizId}.json`)
-    .then(r => {
-      if (!r.ok) throw new Error("問題データが見つかりません");
-      return r.json();
-    })
-    .then(data => {
+  loadQuizData(
+    `data/quiz${normalizedQuizId}.json`,
+    data => {
       quizData = data;
       document.getElementById("quiz-title").textContent = data.title;
       showScreen("screen-id");
-    })
-    .catch(err => showError(err.message));
+    },
+    msg => showError(msg)
+  );
 
   document.getElementById("btn-start").addEventListener("click", startQuiz);
   document.getElementById("btn-next").addEventListener("click", moveNext);
@@ -45,13 +43,39 @@ function showError(msg) {
   loading.innerHTML = `<p class="error-text">エラー: ${msg}</p>`;
 }
 
+function normalizeQuizId(quizId) {
+  const numericId = String(Number(quizId));
+  return numericId.length === 1 ? `0${numericId}` : numericId;
+}
+
+function loadQuizData(url, onSuccess, onError) {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", url, true);
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState !== 4) return;
+
+    if (xhr.status < 200 || xhr.status >= 300) {
+      onError("問題データが見つかりません");
+      return;
+    }
+
+    try {
+      onSuccess(JSON.parse(xhr.responseText));
+    } catch (err) {
+      onError("問題データの形式が正しくありません");
+    }
+  };
+  xhr.onerror = () => onError("問題データを読み込めませんでした");
+  xhr.send();
+}
+
 function setAttemptStatus(message, className = "") {
   const statusEl = document.getElementById("attempt-status");
   statusEl.textContent = message;
   statusEl.className = `attempt-status ${className}`.trim();
 }
 
-async function startQuiz() {
+function startQuiz() {
   const input = document.getElementById("student-id").value.trim();
   if (!input) {
     alert("学籍番号を入力してください。");
@@ -66,13 +90,12 @@ async function startQuiz() {
     startBtn.textContent = "受験状況を確認中...";
     setAttemptStatus("過去の回答を確認しています...", "checking");
 
-    try {
-      const result = await sendToGas({
+    sendToGas({
         action: "check",
         studentId,
         quizId: String(quizData.id)
-      });
-
+      })
+      .then(result => {
       if (result.alreadyTaken || result.status === "duplicate" || result.canStart === false) {
         setAttemptStatus("この学籍番号はすでに回答済みです。再受験はできません。", "error");
         startBtn.textContent = "回答済み";
@@ -82,14 +105,20 @@ async function startQuiz() {
       setAttemptStatus("", "");
       startBtn.disabled = false;
       startBtn.textContent = "テストを開始する";
-    } catch (err) {
+      beginQuiz();
+      })
+      .catch(() => {
       setAttemptStatus("受験状況を確認できませんでした。時間をおいて再度お試しください。", "error");
       startBtn.disabled = false;
       startBtn.textContent = "テストを開始する";
-      return;
-    }
+      });
+    return;
   }
 
+  beginQuiz();
+}
+
+function beginQuiz() {
   currentIndex = 0;
   answers = [];
   showQuestion();
@@ -245,7 +274,9 @@ function sendToGas(params) {
     function cleanup() {
       window.clearTimeout(timeout);
       delete window[callbackName];
-      script.remove();
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
     }
 
     window[callbackName] = result => {
@@ -253,10 +284,11 @@ function sendToGas(params) {
       resolve(result || {});
     };
 
-    const query = new URLSearchParams({
-      ...params,
-      callback: callbackName
+    const query = new URLSearchParams();
+    Object.keys(params).forEach(key => {
+      query.set(key, params[key]);
     });
+    query.set("callback", callbackName);
 
     script.onerror = () => {
       cleanup();

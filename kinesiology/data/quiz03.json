@@ -18,10 +18,10 @@
       "id": 2,
       "question": "本実習で使用するVICON（三次元動作解析装置）のサンプリング周波数として正しいのはどれか？",
       "options": [
-        "50 Hz",
+        "1 Hz",
         "100 Hz",
-        "500 Hz",
-        "1000 Hz"
+        "1000 Hz",
+        "10000 Hz"
       ],
       "answer": 1,
       "explanation": "本実習ではVICONのサンプリング周波数は100Hz、フォースプレートは1000Hz。フォースプレートの方が高い周波数で計測するのは、床反力の急激な変化（衝撃）を正確に捉えるため。"
@@ -35,8 +35,8 @@
         "Cleveland Clinicモデル",
         "UCSFマーカーセット"
       ],
-      "answer": 1,
-      "explanation": "Plug-in Gaitは主に歩行解析に特化した反射マーカーの貼り方。本実習の立ち上がり・ジャンプ動作計測でもHelena Hayesマーカーセット（Plug-in Gaitに対応）を使用する。"
+      "answer": 2,
+      "explanation": "Plug-in Gaitは主に歩行解析に特化した反射マーカーの貼り方。"
     },
     {
       "id": 4,

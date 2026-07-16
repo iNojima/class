@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>運動学実習 発表評価</title>
+<style>
+  :root{
+    --ink:#1f2a2e; --muted:#5c6b70; --line:#d7ddde; --bg:#f5f6f4;
+    --card:#ffffff; --accent:#2f6f6b; --accent-soft:#e6f0ef;
+    --warn:#b4482f; --ok:#2f7d4f;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,system-ui,sans-serif;
+    line-height:1.6; padding:1.5rem 1rem 4rem;
+  }
+  .wrap{max-width:760px; margin:0 auto;}
+  header{margin-bottom:1.5rem;}
+  h1{font-size:1.4rem; margin:0 0 .3rem;}
+  .sub{color:var(--muted); font-size:.9rem;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:1.2rem 1.2rem 1.4rem; margin-bottom:1.1rem;
+  }
+  .row{display:flex; gap:1rem; flex-wrap:wrap;}
+  .field{flex:1 1 200px; margin-bottom:.9rem;}
+  label.lbl{display:block; font-weight:600; font-size:.9rem; margin-bottom:.35rem;}
+  input[type=text], select, textarea{
+    width:100%; padding:.55rem .65rem; border:1px solid var(--line);
+    border-radius:7px; font-size:1rem; font-family:inherit; background:#fff;
+  }
+  textarea{resize:vertical; min-height:70px;}
+  .seg{display:flex; gap:.4rem;}
+  .seg label{flex:1;}
+  .seg input{position:absolute; opacity:0; pointer-events:none;}
+  .seg span{
+    display:block; text-align:center; padding:.5rem 0; border:1px solid var(--line);
+    border-radius:7px; cursor:pointer; font-weight:600; background:#fff; user-select:none;
+  }
+  .seg input:checked + span{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .seg input:focus-visible + span{outline:2px solid var(--accent); outline-offset:2px;}
+  .crit{border-top:1px solid var(--line); padding-top:1rem; margin-top:1rem;}
+  .crit:first-of-type{border-top:0; padding-top:0; margin-top:0;}
+  .crit-head{display:flex; align-items:baseline; gap:.5rem; margin-bottom:.15rem;}
+  .crit-no{
+    flex:0 0 auto; width:1.6rem; height:1.6rem; border-radius:50%;
+    background:var(--accent-soft); color:var(--accent); font-weight:700;
+    display:flex; align-items:center; justify-content:center; font-size:.85rem;
+  }
+  .crit-title{font-weight:700;}
+  .crit-desc{color:var(--muted); font-size:.85rem; margin:.1rem 0 .6rem 2.1rem;}
+  .scorebar{margin-left:2.1rem;}
+  .scale-hint{display:flex; justify-content:space-between; color:var(--muted); font-size:.72rem; margin-top:.2rem;}
+  .total-card{
+    position:sticky; bottom:1rem; background:var(--accent); color:#fff;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:1rem 1.3rem; border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,.15);
+    margin-top:1.2rem;
+  }
+  .total-card .num{font-size:1.8rem; font-weight:700;}
+  .total-card .num small{font-size:1rem; font-weight:400; opacity:.85;}
+  button.save{
+    background:#fff; color:var(--accent); border:none; padding:.7rem 1.4rem;
+    border-radius:8px; font-size:1rem; font-weight:700; cursor:pointer;
+  }
+  button.save:disabled{opacity:.5; cursor:default;}
+  .msg{margin-top:.8rem; padding:.7rem .9rem; border-radius:8px; font-size:.9rem; display:none;}
+  .msg.show{display:block;}
+  .msg.ok{background:#e7f4ec; color:var(--ok); border:1px solid #bfe0cb;}
+  .msg.err{background:#fbeae6; color:var(--warn); border:1px solid #edc4b8;}
+  .req{color:var(--warn); font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>運動学実習 発表評価フォーム</h1>
+    <div class="sub">各項目5点・6項目で30点満点。採点後に「保存」で記録されます。</div>
+  </header>
+
+  <div class="card">
+    <div class="row">
+      <div class="field">
+        <label class="lbl" for="grader">採点者 <span class="req">*</span></label>
+        <input type="text" id="grader" placeholder="氏名を入力">
+      </div>
+      <div class="field">
+        <label class="lbl" for="group">評価対象グループ <span class="req">*</span></label>
+        <select id="group">
+          <option value="">選択してください</option>
+          <option>Group1</option><option>Group2</option>
+          <option>Group3</option><option>Group4</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="lbl" for="task">課題 <span class="req">*</span></label>
+        <select id="task">
+          <option value="">選択してください</option>
+          <option>課題A</option><option>課題B</option><option>課題C</option>
+          <option>課題D</option><option>課題E</option><option>課題F</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="criteria"></div>
+
+  <div class="card">
+    <label class="lbl" for="comment">発表グループに対するコメント</label>
+    <textarea id="comment" placeholder="良かった点・改善点など"></textarea>
+  </div>
+
+  <div class="total-card">
+    <div><div style="font-size:.85rem;opacity:.9;">合計</div>
+      <div class="num"><span id="total">0</span><small> / 30</small></div></div>
+    <button class="save" id="saveBtn">保存</button>
+  </div>
+  <div class="msg" id="msg"></div>
+</div>
+
+<script src="config.js"></script>
+<script>
+const CRITERIA = [
+  {key:"s1", title:"解析結果の提示", desc:"図表を用い視覚的に分かりやすくまとめられているか"},
+  {key:"s2", title:"方法の再現性", desc:"他班でも同様の解析が可能なレベルで手順が共有されているか"},
+  {key:"s3", title:"考察の論理性", desc:"議論に基づき文献等を参照し妥当な解釈がされているか"},
+  {key:"s4", title:"発表態度", desc:"自分の言葉で率直に、誠実な説明ができているか"},
+  {key:"s5", title:"質疑応答への姿勢", desc:"質問を歓迎し建設的な議論ができているか"},
+  {key:"s6", title:"発表全体", desc:"発表全体としての完成度・総合的な評価"},
+];
+
+const box = document.getElementById("criteria");
+CRITERIA.forEach((c,i)=>{
+  const seg = [1,2,3,4,5].map(v=>`
+    <label>
+      <input type="radio" name="${c.key}" value="${v}">
+      <span>${v}</span>
+    </label>`).join("");
+  box.insertAdjacentHTML("beforeend", `
+    <div class="crit">
+      <div class="crit-head">
+        <div class="crit-no">${i+1}</div>
+        <div class="crit-title">${c.title}</div>
+      </div>
+      <div class="crit-desc">${c.desc}</div>
+      <div class="scorebar">
+        <div class="seg" data-key="${c.key}">${seg}</div>
+        <div class="scale-hint"><span>1 低い</span><span>5 高い</span></div>
+      </div>
+    </div>`);
+});
+
+const totalEl = document.getElementById("total");
+function calcTotal(){
+  let t=0;
+  CRITERIA.forEach(c=>{
+    const sel=document.querySelector(`input[name="${c.key}"]:checked`);
+    if(sel) t+=Number(sel.value);
+  });
+  totalEl.textContent=t;
+  return t;
+}
+document.getElementById("criteria").addEventListener("change", calcTotal);
+
+const msg=document.getElementById("msg");
+function showMsg(text, ok){
+  msg.textContent=text;
+  msg.className="msg show "+(ok?"ok":"err");
+}
+
+document.getElementById("saveBtn").addEventListener("click", async ()=>{
+  const grader=document.getElementById("grader").value.trim();
+  const group=document.getElementById("group").value;
+  const task=document.getElementById("task").value;
+
+  if(!grader){ showMsg("採点者名を入力してください。", false); return; }
+  if(!group){ showMsg("評価対象グループを選択してください。", false); return; }
+  if(!task){ showMsg("課題を選択してください。", false); return; }
+
+  const scores={};
+  for(const c of CRITERIA){
+    const sel=document.querySelector(`input[name="${c.key}"]:checked`);
+    if(!sel){ showMsg(`「${c.title}」を採点してください。`, false); return; }
+    scores[c.key]=sel.value;
+  }
+
+  if(typeof GAS_URL==="undefined" || !GAS_URL){
+    showMsg("保存先(GAS_URL)が未設定です。config.js を確認してください。", false);
+    return;
+  }
+
+  const payload={
+    grader, group, task, comment:document.getElementById("comment").value.trim(),
+    ...scores, total:calcTotal()
+  };
+
+  const btn=document.getElementById("saveBtn");
+  btn.disabled=true; btn.textContent="保存中...";
+  try{
+    const res=await fetch(GAS_URL,{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    });
+    const data=await res.json();
+    if(data.result==="success"){
+      showMsg("保存しました。次の評価に進めます。", true);
+      document.querySelectorAll('input[type=radio]:checked').forEach(r=>r.checked=false);
+      document.getElementById("comment").value="";
+      calcTotal();
+    }else{
+      showMsg("保存に失敗しました: "+(data.message||"不明なエラー"), false);
+    }
+  }catch(err){
+    showMsg("送信エラー: "+err.message, false);
+  }finally{
+    btn.disabled=false; btn.textContent="保存";
+  }
+});
+</script>
+</body>
+</html>

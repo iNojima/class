@@ -84,7 +84,11 @@
     <div class="row">
       <div class="field">
         <label class="lbl" for="grader">採点者 <span class="req">*</span></label>
-        <input type="text" id="grader" placeholder="氏名を入力">
+        <select id="grader">
+          <option value="">選択してください</option>
+          <option>飯塚</option><option>吉田</option>
+          <option>山中</option><option>野嶌</option>
+        </select>
       </div>
       <div class="field">
         <label class="lbl" for="group">評価対象グループ <span class="req">*</span></label>
@@ -171,11 +175,11 @@ function showMsg(text, ok){
 }
 
 document.getElementById("saveBtn").addEventListener("click", async ()=>{
-  const grader=document.getElementById("grader").value.trim();
+  const grader=document.getElementById("grader").value;
   const group=document.getElementById("group").value;
   const task=document.getElementById("task").value;
 
-  if(!grader){ showMsg("採点者名を入力してください。", false); return; }
+  if(!grader){ showMsg("採点者を選択してください。", false); return; }
   if(!group){ showMsg("評価対象グループを選択してください。", false); return; }
   if(!task){ showMsg("課題を選択してください。", false); return; }
 
